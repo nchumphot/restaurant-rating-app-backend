@@ -28,4 +28,15 @@ app.get("/restaurants", async (req, res) => {
         response: dbres.rows
     });
 });
+
+app.get<{id: number}, {}, {}>("/restaurants/:id", async (req, res) => {
+    const id = req.params.id;
+    const text = "SELECT * FROM restaurants LEFT JOIN reviews ON restaurants.id = reviews.restaurant_id WHERE restaurants.id = $1;"
+    const dbres = await client.query(text, [id]);
+    res.status(200).json({
+        status: "success",
+        message: `The response body contains more information about restaurant with ID = ${id}.`,
+        response: dbres.rows
+    });
+});
 });
