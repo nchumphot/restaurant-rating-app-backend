@@ -10,7 +10,7 @@ app.use(cors());
 config();
 
 client.connect().then(() => {
-    app.listen(process.env.PORT, () => console.log(`Server is listening on port ${process.env.PORT}!`));
+app.listen(process.env.PORT, () => console.log(`Server is listening on port ${process.env.PORT}!`));
 
 app.get("/", async (req, res) => {
     res.status(200).json({
@@ -39,4 +39,18 @@ app.get<{id: number}, {}, {}>("/restaurants/:id", async (req, res) => {
         response: dbres.rows
     });
 });
+
+app.post<{}, {}, {name: string, street: string, city: string, postcode: string}>("/restaurants", async (req, res) => {
+    const { name, street, city, postcode } = req.body;
+    const text1 = "INSERT INTO restaurants (name) VALUES ($1) RETURNING *;"
+    const dbres1 = await client.query(text1, [name]);
+    const newRestaurantId = dbres1.rows[0].id;
+    const text2 = "INSERT INTO addresses (restaurant_id, street, city, postcode) VALUES ($1, $2, $3, $4) RETURNING *;"
+    const dbres2 = await client.query(text2, [newRestaurantId, street, city, postcode]);
+    res.status(203).json({
+        status: "success",
+        message: `Restaurant has been created with ID ${newRestaurantId}.`,
+        response: dbres2.rows
+    });
+})
 });
