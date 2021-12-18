@@ -52,5 +52,18 @@ app.post<{}, {}, {name: string, street: string, city: string, postcode: string}>
         message: `Restaurant has been created with ID ${newRestaurantId}.`,
         response: dbres2.rows
     });
+});
+
+app.post<{id: number}, {}, {comment: string, score: number}>("/restaurants/:id", async (req, res) => {
+    const id = req.params.id;
+    const { comment, score } = req.body;
+    const text = "INSERT INTO reviews (restaurant_id, comment, score) VALUES ($1, $2, $3) RETURNING *;"
+    const dbres = await client.query(text, [id, comment, score]);
+    res.status(203).json({
+        status: "success",
+        message: `Comment has been added to restaurant with ID ${dbres.rows[0].restaurant_id}.`,
+        response: dbres.rows
+    });
 })
+
 });
