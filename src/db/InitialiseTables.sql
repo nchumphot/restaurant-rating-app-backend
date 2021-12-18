@@ -16,7 +16,8 @@ CREATE TABLE addresses (
 );
 
 CREATE TABLE reviews (
-    restaurant_id INT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
+    restaurant_id INT,
     comment VARCHAR(300),
     score INT NOT NULL,
     submission_date TIMESTAMP NOT NULL DEFAULT NOW(),
